@@ -1,6 +1,6 @@
 ---
 title: "GAE6: Pea Aphids: multiple comparisons"
-author: "Your Name Here"
+author: "Jaslyn"
 format: 
   html:
     embed-resources: true
@@ -81,6 +81,14 @@ To measure color, the researchers used Adobe Photoshop CS (version 8.01, Adobe I
 
 I tested for differences among the un-injected control (Control), the injected but uninfected aphids (Uninfected), and the injected and infected aphids (Infected) by analysis of variance (ANOVA) using the lm() function from R [@base] and the Anova() function from the car package [@car]. All data manipulation and graphical results were computed using packages provided by the tidyverse metapackage [@tidyverse] and all tabular results were produced using the kbl() function from the kableExtra package [@kableExtra].
 
+Emmeans [@emmeans] package was used to compute planned and unplanned comparisons to test:
+
+-   If un-injected aphids differed from those that had been injected, and
+
+-   if uninfected aphids differed in color from those that were infected by *Rickettsiella.*
+
+-   All pair-wise comparisons of means.
+
 ## Results:
 
 Infected pea aphids exhibited distinctly larger hue angles and hence greener colors (@tbl-ANOVA, @fig-Aphids). This result supports the researchers' hypothesis that infection may lead to color change.
@@ -122,6 +130,68 @@ kbl(
 ```
 
 ```{r}
+#| label: tbl-Planned
+#| tbl-cap: "Planned hyptothesis test"
+
+aphidMeans <- emmeans(aphidMod, "Treatment")
+
+aphidCont <- tidy(contrast(
+    aphidMeans,
+    method = list(
+      #                            Un-Inj  Un-INF  INF
+      'control vs Sham & Inf' =  c( 2,      -1,     -1),
+      'Uninfected vs infected' = c( 0,      1,      -1)
+    ),
+  adjust = "none"
+))[,-c(1,3)]
+
+aphidCont$p.value <- format.pval(
+    aphidCont$p.value,
+    digets = 3,
+    eps = 0.001,
+    na.form = ''
+)
+
+
+kbl(
+  aphidCont,
+  col.names = c(
+    "Contrast",
+    "Estimate",
+    "SE",
+    "df",
+    "t",
+    "p"
+  ),
+digits = c(0,3,3,0,3,3),
+align = "r",
+table.attr = 'data-quarto-disable-processing="true"'
+) |>
+kable_classic(full= FALSE)
+  
+
+
+```
+
+There is a significant difference between both control vs Sham and infected as well as uninfected vs infected.
+
+```{r}
+#| label: tbl-Tukey
+#| tbl-cap: "All pair-wise comparisons of means with the Tukey correlation to protect the experiment the experimentwize error rate at 0.05."
+
+
+kbl(
+  pairs(aphidMeans),
+  digits = 4,
+  table.attr = 'data-qusrto-disable-processing="true"'
+  ) |>
+  kable_classic(full = FALSE)
+
+```
+
+Control - Uninfected showed no significanance, while Control- Infected and Uninfected-Infected both showed significance.
+
+```{r}
 #| label: fig-Aphids
 #| fig-cap: "Color change as measured by hue angle for pea aphids (*Acyrthosiphon pisum*) that were infected with *Rickettsiella* compared to uninfected and control aphids."
 
@@ -154,6 +224,9 @@ ggplot(aphids)+
     legend.position = "none"
   )
 
+```
+
+```{}
 ```
 
 ## References:
