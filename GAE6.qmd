@@ -189,7 +189,7 @@ kbl(
 
 ```
 
-Control - Uninfected showed no significanance, while Control- Infected and Uninfected-Infected both showed significance.
+Control - Uninfected showed no significance, while Control- Infected and Uninfected-Infected both showed significance.
 
 ```{r}
 #| label: fig-Aphids
@@ -226,7 +226,7 @@ ggplot(aphids)+
 
 ```
 
-```{}
+```         
 ```
 
 ## References:
